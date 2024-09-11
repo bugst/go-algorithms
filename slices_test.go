@@ -54,3 +54,42 @@ func TestMap(t *testing.T) {
 		require.Equal(t, "you?", parts[3])
 	}
 }
+
+func TestReduce(t *testing.T) {
+	and := func(in ...bool) bool {
+		return f.Reduce(in, func(a, b bool) bool { return a && b }, true)
+	}
+	require.True(t, and())
+	require.True(t, and(true))
+	require.False(t, and(false))
+	require.True(t, and(true, true))
+	require.False(t, and(true, false))
+	require.False(t, and(false, true))
+	require.False(t, and(false, false))
+	require.False(t, and(true, true, false))
+	require.False(t, and(false, true, false))
+	require.False(t, and(false, true, true))
+	require.True(t, and(true, true, true))
+
+	or := func(in ...bool) bool {
+		return f.Reduce(in, func(a, b bool) bool { return a || b }, false)
+	}
+	require.False(t, or())
+	require.True(t, or(true))
+	require.False(t, or(false))
+	require.True(t, or(true, true))
+	require.True(t, or(true, false))
+	require.True(t, or(false, true))
+	require.False(t, or(false, false))
+	require.True(t, or(true, true, false))
+	require.True(t, or(false, true, false))
+	require.False(t, or(false, false, false))
+	require.True(t, or(true, true, true))
+
+	add := func(in ...int) int {
+		return f.Reduce(in, func(a, b int) int { return a + b })
+	}
+	require.Equal(t, 0, add())
+	require.Equal(t, 10, add(10))
+	require.Equal(t, 15, add(10, 2, 3))
+}
