@@ -18,31 +18,34 @@ func DiscardCh[T any](ch <-chan T) {
 
 // Future is an object that holds a result value. The value may be read and
 // written asynchronously.
-type Future[T any] interface {
-	Send(T)
-	Await() T
-}
-
-type future[T any] struct {
-	wg    sync.WaitGroup
+type Future[T any] struct {
+	lock  sync.Mutex
+	set   bool
+	cond  *sync.Cond
 	value T
 }
 
-// NewFuture creates a new Future[T]
-func NewFuture[T any]() Future[T] {
-	res := &future[T]{}
-	res.wg.Add(1)
-	return res
-}
-
 // Send a result in the Future. Threads waiting for result will be unlocked.
-func (f *future[T]) Send(value T) {
+func (f *Future[T]) Send(value T) {
+	f.lock.Lock()
+	defer f.lock.Unlock()
+	f.set = true
 	f.value = value
-	f.wg.Done()
+	if f.cond != nil {
+		f.cond.Broadcast()
+		f.cond = nil
+	}
 }
 
 // Await for a result from the Future, blocks until a result is available.
-func (f *future[T]) Await() T {
-	f.wg.Wait()
+func (f *Future[T]) Await() T {
+	f.lock.Lock()
+	defer f.lock.Unlock()
+	for !f.set {
+		if f.cond == nil {
+			f.cond = sync.NewCond(&f.lock)
+		}
+		f.cond.Wait()
+	}
 	return f.value
 }
