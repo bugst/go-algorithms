@@ -51,13 +51,13 @@ func ParallelMap[T, U any](values []T, mapper Mapper[T, U], jobs ...int) []U {
 	} else {
 		panic("jobs must be a single value")
 	}
-	N := min(j, len(values))
+	j = min(j, len(values))
 
 	var idx atomic.Int64
 	idx.Store(-1)
 	var wg sync.WaitGroup
-	wg.Add(N)
-	for count := 0; count < N; count++ {
+	wg.Add(j)
+	for count := 0; count < j; count++ {
 		go func() {
 			i := int(idx.Add(1))
 			for i < len(values) {
