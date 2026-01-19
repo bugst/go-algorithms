@@ -4,7 +4,7 @@ import (
 	"bytes"
 )
 
-const BufferSize = 1024
+const defaultBufferSize = 1024
 
 // CallbackWriter is a custom writer that processes each line calling the callback.
 type CallbackWriter struct {
@@ -16,7 +16,7 @@ type CallbackWriter struct {
 func NewCallbackWriter(process func(line string)) *CallbackWriter {
 	return &CallbackWriter{
 		callback: process,
-		buffer:   make([]byte, 0, BufferSize),
+		buffer:   make([]byte, 0, defaultBufferSize),
 	}
 }
 
@@ -33,4 +33,12 @@ func (p *CallbackWriter) Write(data []byte) (int, error) {
 		p.callback(string(line))
 	}
 	return len(data), nil
+}
+
+func (p *CallbackWriter) Close() error {
+	if len(p.buffer) > 0 {
+		p.callback(string(p.buffer))
+		p.buffer = p.buffer[:0]
+	}
+	return nil
 }
