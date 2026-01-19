@@ -2,26 +2,27 @@ package f
 
 import (
 	"bytes"
+	"io"
 )
 
 const defaultBufferSize = 1024
 
-// CallbackWriter is a custom writer that processes each line calling the callback.
-type CallbackWriter struct {
+// callbackWriter is a custom writer that processes each line calling the callback.
+type callbackWriter struct {
 	callback func(line string)
 	buffer   []byte
 }
 
 // NewCallbackWriter creates a new CallbackWriter.
-func NewCallbackWriter(process func(line string)) *CallbackWriter {
-	return &CallbackWriter{
+func NewCallbackWriter(process func(line string)) io.WriteCloser {
+	return &callbackWriter{
 		callback: process,
 		buffer:   make([]byte, 0, defaultBufferSize),
 	}
 }
 
 // Write implements the io.Writer interface.
-func (p *CallbackWriter) Write(data []byte) (int, error) {
+func (p *callbackWriter) Write(data []byte) (int, error) {
 	p.buffer = append(p.buffer, data...)
 	for {
 		idx := bytes.IndexByte(p.buffer, '\n')
@@ -35,7 +36,7 @@ func (p *CallbackWriter) Write(data []byte) (int, error) {
 	return len(data), nil
 }
 
-func (p *CallbackWriter) Close() error {
+func (p *callbackWriter) Close() error {
 	if len(p.buffer) > 0 {
 		p.callback(string(p.buffer))
 		p.buffer = p.buffer[:0]
