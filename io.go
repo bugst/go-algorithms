@@ -23,17 +23,34 @@ func NewCallbackWriter(process func(line string)) io.WriteCloser {
 
 // Write implements the io.Writer interface.
 func (p *callbackWriter) Write(data []byte) (int, error) {
-	p.buffer = append(p.buffer, data...)
+	l := len(data)
 	for {
-		idx := bytes.IndexByte(p.buffer, '\n')
-		if idx == -1 {
-			break
+		if len(data) == 0 {
+			return l, nil
 		}
-		line := p.buffer[:idx] // Do not include \n
-		p.buffer = p.buffer[idx+1:]
-		p.callback(string(line))
+
+		idx := bytes.IndexByte(data, '\n')
+		if idx == -1 {
+			// No complete line found, buffer the data
+			p.buffer = append(p.buffer, data...)
+			return l, nil
+		}
+
+		if len(p.buffer) == 0 {
+			// Fast path: no buffered data, process directly from input
+			p.callback(string(data[:idx]))
+			data = data[idx+1:]
+			continue
+		}
+
+		// Append up to the newline to the buffer and process
+		p.buffer = append(p.buffer, data[:idx]...)
+		p.callback(string(p.buffer))
+
+		// Clear the buffer and continue with remaining data
+		p.buffer = p.buffer[:0]
+		data = data[idx+1:]
 	}
-	return len(data), nil
 }
 
 func (p *callbackWriter) Close() error {
