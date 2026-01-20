@@ -19,6 +19,13 @@ func Must[T any](val T, err error) T {
 	return val
 }
 
+// NoError panics if the given error is not nil.
+func NoError(err error) {
+	if err != nil {
+		panic(err.Error())
+  }
+}
+
 // Assert panics if condition is false.
 func Assert(condition bool, msg string, args ...any) {
 	if !condition {
