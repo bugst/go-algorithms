@@ -7,13 +7,13 @@ import (
 
 const defaultBufferSize = 1024
 
-// callbackWriter is a custom writer that processes each line calling the callback.
 type callbackWriter struct {
 	callback func(line string)
 	buffer   []byte
 }
 
-// NewCallbackWriter creates a new CallbackWriter.
+// NewCallbackWriter creates a WriterCloser that will buffer input and call the provided callback for each complete line.
+// The last line (if not ending with a newline) will be processed when Close() is called.
 func NewCallbackWriter(process func(line string)) io.WriteCloser {
 	return &callbackWriter{
 		callback: process,
@@ -53,6 +53,7 @@ func (p *callbackWriter) Write(data []byte) (int, error) {
 	}
 }
 
+// Close implements the io.Closer interface.
 func (p *callbackWriter) Close() error {
 	if len(p.buffer) > 0 {
 		p.callback(string(p.buffer))
