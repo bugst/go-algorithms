@@ -8,6 +8,8 @@
 
 package f
 
+import "fmt"
+
 // Must should be used to wrap a call to a function returning a value and an error.
 // Must returns the value if the errors is nil, or panics otherwise.
 func Must[T any](val T, err error) T {
@@ -21,5 +23,12 @@ func Must[T any](val T, err error) T {
 func NoError(err error) {
 	if err != nil {
 		panic(err.Error())
+  }
+}
+
+// Assert panics if condition is false.
+func Assert(condition bool, msg string, args ...any) {
+	if !condition {
+		panic(fmt.Sprintf(msg, args...))
 	}
 }
