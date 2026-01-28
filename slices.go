@@ -9,6 +9,7 @@
 package f
 
 import (
+	"iter"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -112,4 +113,16 @@ func Uniq[T comparable](in []T) []T {
 		have[v] = true
 	}
 	return out
+}
+
+// RefIter takes a slice of type []T and returns an iterator that yields
+// pointers to each element of the slice.
+func RefIter[T any](slice []T) iter.Seq[*T] {
+	return func(yield func(*T) bool) {
+		for i := range slice {
+			if !yield(&slice[i]) {
+				return
+			}
+		}
+	}
 }
