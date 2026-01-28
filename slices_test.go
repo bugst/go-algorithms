@@ -9,9 +9,11 @@
 package f_test
 
 import (
+	"slices"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	f "go.bug.st/f"
 )
@@ -99,4 +101,36 @@ func TestCount(t *testing.T) {
 	require.Equal(t, 1, f.Count(a, f.Equals("bbb")))
 	require.Equal(t, 0, f.Count(a, f.Equals("ddd")))
 	require.Equal(t, 3, f.Count(a, f.NotEquals("ddd")))
+}
+
+func TestRefIter(t *testing.T) {
+	type foo struct {
+		value int
+	}
+	values := []foo{
+		{value: 1},
+		{value: 2},
+		{value: 3},
+	}
+
+	t.Run("not working for range", func(t *testing.T) {
+		for _, v := range values {
+			v.value *= 10
+		}
+		assert.Equal(t, []foo{{1}, {2}, {3}}, values)
+	})
+
+	t.Run("not working slices.Values", func(t *testing.T) {
+		for v := range slices.Values(values) {
+			v.value *= 10
+		}
+		assert.Equal(t, []foo{{1}, {2}, {3}}, values)
+	})
+
+	t.Run("working RefIter", func(t *testing.T) {
+		for v := range f.RefIter(values) {
+			v.value *= 10
+		}
+		assert.Equal(t, []foo{{10}, {20}, {30}}, values)
+	})
 }
