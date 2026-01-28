@@ -115,7 +115,6 @@ func Uniq[T comparable](in []T) []T {
 	return out
 }
 
-
 // Count returns the number of elements in the input array that match the given matcher
 func Count[T any](in []T, matcher Matcher[T]) int {
 	var count int
@@ -138,3 +137,4 @@ func RefIter[T any](slice []T) iter.Seq[*T] {
 		}
 	}
 }
+
