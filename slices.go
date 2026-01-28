@@ -1,7 +1,7 @@
 //
 // This file is part of go-algorithms.
 //
-// Copyright 2024 Cristian Maglie. All rights reserved.
+// Copyright (c) 2024-2026 go-algorithms (go.bug.st/f) authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 //
@@ -113,6 +113,18 @@ func Uniq[T comparable](in []T) []T {
 		have[v] = true
 	}
 	return out
+}
+
+
+// Count returns the number of elements in the input array that match the given matcher
+func Count[T any](in []T, matcher Matcher[T]) int {
+	var count int
+	for _, v := range in {
+		if matcher(v) {
+			count++
+		}
+	}
+	return count
 }
 
 // RefIter takes a slice of type []T and returns an iterator that yields

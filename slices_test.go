@@ -1,7 +1,7 @@
 //
 // This file is part of go-algorithms.
 //
-// Copyright 2024 Cristian Maglie. All rights reserved.
+// Copyright (c) 2024-2026 go-algorithms (go.bug.st/f) authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 //
@@ -92,4 +92,11 @@ func TestReduce(t *testing.T) {
 	require.Equal(t, 0, add())
 	require.Equal(t, 10, add(10))
 	require.Equal(t, 15, add(10, 2, 3))
+}
+
+func TestCount(t *testing.T) {
+	a := []string{"aaa", "bbb", "ccc"}
+	require.Equal(t, 1, f.Count(a, f.Equals("bbb")))
+	require.Equal(t, 0, f.Count(a, f.Equals("ddd")))
+	require.Equal(t, 3, f.Count(a, f.NotEquals("ddd")))
 }
