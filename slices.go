@@ -9,6 +9,7 @@
 package f
 
 import (
+	"iter"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -124,3 +125,16 @@ func Count[T any](in []T, matcher Matcher[T]) int {
 	}
 	return count
 }
+
+// RefIter takes a slice of type []T and returns an iterator that yields
+// pointers to each element of the slice.
+func RefIter[T any](slice []T) iter.Seq[*T] {
+	return func(yield func(*T) bool) {
+		for i := range slice {
+			if !yield(&slice[i]) {
+				return
+			}
+		}
+	}
+}
+
