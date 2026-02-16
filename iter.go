@@ -1,3 +1,10 @@
+//
+// This file is part of go-algorithms.
+//
+// Copyright (c) 2024-2026 go-algorithms (go.bug.st/f) authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package f
 
 import "iter"
@@ -15,7 +22,7 @@ func FilterIter[T any](values iter.Seq[T], matcher Matcher[T]) iter.Seq[T] {
 	}
 }
 
-// Map applies the Mapper function to each element of the iterator.
+// MapIter applies the Mapper function to each element of the iterator.
 func MapIter[T, U any](values iter.Seq[T], mapper Mapper[T, U]) iter.Seq[U] {
 	return func(yield func(x U) bool) {
 		for x := range values {
@@ -26,7 +33,7 @@ func MapIter[T, U any](values iter.Seq[T], mapper Mapper[T, U]) iter.Seq[U] {
 	}
 }
 
-// Reducer is a function that reduces an iterator's elements to a single value.
+// ReducerIter is a function that reduces an iterator's elements to a single value.
 func ReduceIter[T any](values iter.Seq[T], reducer Reducer[T], initialValue ...T) T {
 	var result T
 	if len(initialValue) > 1 {
